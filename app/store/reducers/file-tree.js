@@ -3,7 +3,8 @@ import {
   SET_FILE_TREE,
   SET_SEARCH_RESULTS,
   SET_FILE_PATH,
-  SET_FOLDER_STRUCTURE
+  SET_FOLDER_STRUCTURE,
+  SET_REMOTE_URL
 } from '../actions/file-tree';
 
 const DEFAULT_PATH = '/Users/cameron/Projects/open-source/d3-quadtree/src';
@@ -13,6 +14,7 @@ const defaultState = {
   filePath: DEFAULT_PATH, // default thing to load
   // Temporary home for python script related state, before a new reducer is made
   folderStructure: undefined,
+  remoteUrl: ''
 };
 
 // Store data relating to the dependency tree
@@ -27,6 +29,8 @@ export default function fileTree(state = defaultState, action) {
       return { ...state, filePath: action.payload.filePath };
     case SET_FOLDER_STRUCTURE:
       return { ...state, folderStructure: action.payload.folderStructure };
+    case SET_REMOTE_URL:
+      return { ...state, remoteUrl: action.payload.remoteUrl };
     default:
       return state;
   }

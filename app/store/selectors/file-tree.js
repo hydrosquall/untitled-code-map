@@ -19,6 +19,11 @@ export const folderStructure$ = createSelector(
   state => state.folderStructure
 );
 
+export const remoteUrl$ = createSelector(
+  fileTreeState$,
+  state => state.remoteUrl
+);
+
 // DOT format string
 export const fileTree$ = createSelector(
   fileTreeState$,
@@ -116,6 +121,7 @@ export const fileTreeList$ = createSelector(
 export default {
   fileTree$,
   fileTreeList$,
+  remoteUrl$,
   // visNetworkGraph$,
   // networkXGraph$
 };
