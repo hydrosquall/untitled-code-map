@@ -121,22 +121,73 @@ function execShellCommand(cmd) {
  });
 }
 
-handlers['get-folder-structure-python'] = async payload => {
-  console.log('Getting directory structure from python script, along with OS metadata');
-  // get relative path to current location
-  const { absPath } = payload;
-  const relativePath = path.relative(process.env.PWD, absPath);
+// Use a shell command to get the required data structure
+async function getFolderStructureShell(absPath) {
   const command = `./app/ipc-server/folder_structure_to_json.py ${absPath}`;
   console.log("Running command");
   console.log(command);
-  //relative to project root
   const hierarchy = await execShellCommand(command).then(response => {
+    console.log(response);
     const parsed = JSON.parse(response);
-    console.log(parsed);
     return parsed;
-  })
-
+  });
   return hierarchy;
+}
+
+
+async function getFolderStructureNode(absPath) {
+  // Let's find the current git repository for that particular file
+  // Use the promise version instead of the callback: https://www.npmjs.com/package/simple-git
+  const gitDirectory = await git(absPath).revparse(['--show-toplevel']);
+  const logOptions = {
+    repo: gitDirectory,
+    fields: ['committerDate'],
+    number: 1000, // arbitrary maximum limit to avoid timing out requests. # of commits to look back.
+  };
+
+  const relativePath = path.relative(process.env.PWD, absPath);
+  const hierarchy = directoryTree(relativePath, { exclude: [
+    /node_modules/,
+    /\.git/
+  ]}, (item, PATH, status) => {
+    // First, apply folder type
+    if (item.type === 'directory') {
+      item.type === 'folder'; // backwards compat with the python script
+    } else {
+      const { extension } = item;
+      if (extension.startsWith('.')) {
+        item.type = extension.substr(1); // only remove first ., to account for double . extensions like .d.ts
+      } else {
+        item.type = 'text';
+      }
+    }
+
+    // Then, supply git metadata
+    const localPath = path.resolve(item.path);
+    // If file has been .gitignored, it won't have data.
+    const lastEdit = gitlog({ ...logOptions, file: localPath, number: 1 })[0];
+    item.last_edit = lastEdit ? lastEdit.committerDate : '';
+    item.num_of_edits = gitlog({...logOptions, file: localPath}).length;
+  });
+  return hierarchy;
+}
+
+async function getRemoteUrl(absPath) {
+  const isVerbose = true; // include URLs and purpose
+  const remotes = await git(absPath).getRemotes(isVerbose);
+  return remotes;
+}
+
+handlers['get-folder-structure'] = async payload => {
+  console.log('Getting directory structure from python script, along with OS metadata');
+  const { absPath } = payload;
+  const useShell = false; // toggle if the node script is broken.
+  if (useShell) {
+    return await getFolderStructureShell(absPath);
+  } else {
+    // const remotes = await getRemoteUrl(absPath);
+    return getFolderStructureNode(absPath);
+  }
 };
 
 module.exports = handlers

@@ -18,7 +18,7 @@ const PageRadialMap = (props) => {
     filePath,
     folderStructure,
     setFilePath,
-    getFolderStructurePython
+    getFolderStructure
   } = props; // use same redux state as the sibling page, decouple this in the future.
   const handleOpenFileOrDirectory = useCallback(
     () => {
@@ -35,9 +35,9 @@ const PageRadialMap = (props) => {
 
   const handleFetchTree = useCallback(
     () => {
-      getFolderStructurePython(filePath);
+      getFolderStructure(filePath);
     },
-    [filePath, getFolderStructurePython]
+    [filePath, getFolderStructure]
   );
 
   const appBarProps = {

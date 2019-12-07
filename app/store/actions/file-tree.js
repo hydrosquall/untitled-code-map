@@ -43,9 +43,9 @@ export function getSearchResults(searchText, folderPath) {
 
 // Amelia's Script
 // temporarily overload
-export function getFolderStructurePython(folderPath) {
+export function getFolderStructure(folderPath) {
   return async (dispatch) => {
-      const folderStructure = await send('get-folder-structure-python', {
+      const folderStructure = await send('get-folder-structure', {
         absPath: folderPath
       });
       dispatch(setFolderStructure(folderStructure));
