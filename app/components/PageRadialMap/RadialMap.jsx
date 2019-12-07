@@ -10,6 +10,8 @@ import { scaleSqrt, scaleLinear } from 'd3-scale';
 import { extent } from 'd3-array';
 import { flatMapDeep, fromPairs } from 'lodash';
 
+import { useSelector } from 'react-redux';
+
 import { UncontrolledReactSVGPanZoom } from 'react-svg-pan-zoom';
 
 import ToggleButton from '@material-ui/lab/ToggleButton';
@@ -19,9 +21,11 @@ import ButtonGroup from '@material-ui/core/ButtonGroup';
 
 import { getPointFromAngleAndDistance } from './utils';
 
+import { remoteUrl$ } from '../../store/selectors/file-tree';
+
 import styles from './page-radial-map.scss';
 
-const repoTreeBaseUrl = 'https://github.com/facebook/react/blob/master/';
+const repoTreeBaseUrl = 'https://github.com/facebook/react/blob/master';
 const flattenArray = item => [item, flatMapDeep(item.children, flattenArray)];
 
 const formatDate = timeFormat('%-m/%-d/%Y');
@@ -44,8 +48,8 @@ const colors = [
   '#778ca3',
   // new colors
   '#cccccc', // yaml
-  "#03dac6", // material turquoise - python
-  "#3700b3", // purple - ipynb
+  '#03dac6', // material turquoise - python
+  '#3700b3' // purple - ipynb
 ];
 const fileTypes = [
   'css',
@@ -80,10 +84,9 @@ const colorScaleSize = scaleLinear()
   .domain([3, 100000]) // TODO: make this dynamic based on passed in data, and specific to the selected metric.
   .range(['#f2f2f7', '#5758BB']);
 
-
-const useWithColorAccessorMap = data => {
+const useWithColorAccessorMap = data =>
   // Calculate before first render
-  return useState(() => {
+  useState(() => {
     const allNodesForColor = flatMapDeep(data.children, flattenArray);
     const colorScaleNumOfEdits = scaleLinear()
       .domain(extent(allNodesForColor, d => d.num_of_edits))
@@ -96,13 +99,11 @@ const useWithColorAccessorMap = data => {
     };
     return colorAccessorMap;
   });
-};
-
 const DEFAULT_WIDTH = 500; // pixels
 const RepositoryRadialMap = ({ folderData, width }) => {
   const [hoveringNode, setHoveringNode] = useState(null);
   const isClearingHover = useRef();
-  const [radius, setRadius] = useState(Math.round(width/2) );
+  const [radius, setRadius] = useState(Math.round(width / 2));
   const [colorMetric, setColorMetric] = useState('type');
 
   const [colorAccessorMap, _] = useWithColorAccessorMap(folderData);
@@ -175,14 +176,19 @@ const RepositoryRadialMap = ({ folderData, width }) => {
             className={styles[`${BLOCK}__toggle`]}
           >
             {colorMetricOptions.map(option => (
-              <ToggleButton key={option.id} value={option.id}>{option.label}</ToggleButton>
+              <ToggleButton key={option.id} value={option.id}>
+                {option.label}
+              </ToggleButton>
             ))}
           </ToggleButtonGroup>
         </div>
         <div className={styles[`${BLOCK}__actions__item`]}>
           <h6>zoom</h6>
           <ButtonGroup>
-            {[{ value: 250, label: '+'}, { value: -250, label: '-'}].map(option => (
+            {[
+              { value: 250, label: '+' },
+              { value: -250, label: '-' }
+            ].map(option => (
               <Button onClick={() => setRadius(radius + option.value)}>
                 {option.label}
               </Button>
@@ -238,14 +244,31 @@ const Node = React.memo(
   }) => {
     const { x, y, data, children } = nodeProps;
 
+    if (children) {
+      children.forEach(child => {
+      if (child.data.id === undefined) {
+        console.log({ child: child.data })
+      }
+    })
+    }
+
+    const baseUrl = useSelector(remoteUrl$);
+
     const onMouseEnter = useCallback(() => {
       onUpdateHover(nodeProps);
     }, []);
     const onClick = useCallback(() => {
-      const url = `${repoTreeBaseUrl}${data.path}/${data.name}`;
+      const url = `${baseUrl}${data.path}`;
+      // const url = `${repoTreeBaseUrl}${data.path}`;
+      console.log(url);
       const win = window.open(url, '_blank');
       win.focus();
     }, []);
+
+    const handlers = useMemo(
+      () => ({ colorMetric, onUpdateHover, onMouseLeave }),
+      [colorMetric, onUpdateHover, onMouseLeave]
+    );
 
     return (
       <>
@@ -272,12 +295,12 @@ const Node = React.memo(
           )}
         </g>
         {children &&
-          children.map(node => (
+          children.map((node, i) => (
             <Node
-              key={node.data.id}
+              key={`${node.data.id}`}
               colorAccessorMap={colorAccessorMap}
               {...node}
-              {...{ colorMetric, onUpdateHover, onMouseLeave }}
+              {...handlers}
             />
           ))}
       </>
