@@ -40,7 +40,7 @@ const PageRadialMap = props => {
 
   return (
     <div ref={ref}>
-      <Navbar {...appBarProps}/>}
+      <Navbar {...appBarProps}/>
       {width && <RepositoryRadialMap folderData={folderData} width={width} />}
     </div>
   );
