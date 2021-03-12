@@ -245,7 +245,7 @@
     "immer": "^4.0.0",
     "jsnetworkx": "^0.3.4",
     "lodash": "^4.17.15",
-    "madge": "^3.4.4",
+    "madge": "^4.0.1",
     "node-ipc": "^9.1.1",
     "react": "^16.9.0",
     "react-cytoscapejs": "^1.2.0",
