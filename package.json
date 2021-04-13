@@ -240,7 +240,7 @@
     "electron-is-dev": "^1.1.0",
     "electron-log": "^2.2.17",
     "electron-updater": "^4.2.0",
-    "gitlog": "^3.1.2",
+    "gitlog": "^4.0.4",
     "history": "^4.7.2",
     "immer": "^4.0.0",
     "jsnetworkx": "^0.3.4",
