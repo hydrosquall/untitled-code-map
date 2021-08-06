@@ -28,7 +28,7 @@ yarn build
 
 If you're just looking to explore the test React repository, you're done!
 
-If you'd like to analyze your own local repositories, you will also need to install [gitpython](https://gitpython.readthedocs.io/en/stable/intro.html). This should be done in the Python environment that is active within the session used to launch your `yarn` commands.
+If you'd like to analyze your own local repositories, continue reading.
 
 ## Usage Notes
 
