@@ -242,7 +242,7 @@
     "electron-updater": "^4.2.0",
     "gitlog": "^3.1.2",
     "history": "^4.7.2",
-    "immer": "^4.0.0",
+    "immer": "^9.0.6",
     "jsnetworkx": "^0.3.4",
     "lodash": "^4.17.15",
     "madge": "^3.4.4",
