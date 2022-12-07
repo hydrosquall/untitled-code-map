@@ -263,7 +263,7 @@
     "redux-thunk": "^2.3.0",
     "reselect": "^4.0.0",
     "ripgrep-js": "^1.1.0",
-    "simple-git": "^1.126.0",
+    "simple-git": "^3.15.0",
     "source-map-support": "^0.5.9",
     "tree-walk-util": "^2.0.4",
     "uuid": "^3.3.3",
